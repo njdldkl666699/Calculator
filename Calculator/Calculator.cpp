@@ -103,7 +103,8 @@ void Calculator::buttonEqualClicked()
 	QString tmp;
 	for (QString::const_iterator it = expression.begin(); it != expression.end(); it++)
 	{
-		if (*it == '-' && isOperator(*(it + 1)))//·ûºÅÎ»
+		if (*it == '-' && (it == expression.begin() ||
+			(*(it - 1) == '(' || isOperator(*(it - 1)))))//·ûºÅÎ»
 		{
 			tmp += *it;
 		}
