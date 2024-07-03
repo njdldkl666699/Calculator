@@ -1,8 +1,9 @@
 #include "Calculator.h"
+#include<QDialog>
+#include<QStack>
 
 Calculator::Calculator(QWidget* parent)
-	: QMainWindow(parent), preVal(0.0), isRlt(false),
-	effect(new QSoundEffect(this)), preOperator(nullptr)
+	: QMainWindow(parent), effect(new QSoundEffect(this)), expression(""), val("0")
 {
 	ui.setupUi(this);
 	this->setWindowIcon(QIcon(":/res/Icon.png"));
@@ -10,7 +11,7 @@ Calculator::Calculator(QWidget* parent)
 	connect(ui.buttonNumGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonNumClicked);
 	connect(ui.buttonOperatorGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonOperatorClicked);
 	connect(ui.pushButton_equal, &QPushButton::clicked, this, &Calculator::buttonEqualClicked);
-	connect(ui.pushButton_ce, &QPushButton::clicked, this, &Calculator::buttonCEClicked);
+	connect(ui.pushButton_bracket, &QPushButton::clicked, this, &Calculator::buttonBracketClicked);
 	connect(ui.pushButton_c, &QPushButton::clicked, this, &Calculator::buttonCClicked);
 	connect(ui.pushButton_del, &QPushButton::clicked, this, &Calculator::buttonDelClicked);
 	connect(ui.pushButton_dot, &QPushButton::clicked, this, &Calculator::buttonDotClicked);
@@ -24,22 +25,17 @@ Calculator::~Calculator()
 void Calculator::buttonNumClicked(QAbstractButton* button)
 {
 	effect->play();
-	if (isRlt)
-		ui.lineEdit->clear();
-
 	const auto& buttonName = button->objectName();
-	auto text = ui.lineEdit->text();
 	if (buttonName.isEmpty())
 		return;
 	else
 	{
-		const QChar num = buttonName.back();
-		if (text.isEmpty() || text == "0")
-			text = num;
+		QString num = buttonName.back();
+		if (val.isEmpty() || val == "0")
+			val = num;
 		else
-			text += num;
-		ui.lineEdit->setText(text);
-		isRlt = false;
+			val += num;
+		ui.lineEdit->setText(val);
 	}
 }
 
@@ -51,25 +47,6 @@ void Calculator::buttonOperatorClicked(QAbstractButton* button)
 		return;
 	else
 	{
-		const auto& num = ui.lineEdit->text().toDouble();
-		if (preOperator != nullptr)
-		{
-			const auto& preBtnName = preOperator->objectName();
-			if (preBtnName == "pushButton_add")
-				preVal += num;
-			else if (preBtnName == "pushButton_sub")
-				preVal -= num;
-			else if (preBtnName == "pushButton_mul")
-				preVal *= num;
-			else if (preBtnName == "pushButton_div")
-				preVal /= num;
-			ui.lineEdit->setText(QString::number(preVal));
-		}
-		else
-		{
-			preVal = ui.lineEdit->text().toDouble();
-		}
-
 		QChar op = '\0';
 		if (buttonName == "pushButton_add")
 			op = '+';
@@ -79,58 +56,166 @@ void Calculator::buttonOperatorClicked(QAbstractButton* button)
 			op = '*';
 		else if (buttonName == "pushButton_div")
 			op = '/';
-		ui.lineEdit_pre->setText(QString::number(preVal) + op);
-		preOperator = button;
-		//ui.lineEdit->setText("0");
-		isRlt = true;
+		if(val!="0")
+			expression += val;
+		expression += op;
+		val = '0';
+		ui.lineEdit->setText(val);
+		ui.lineEdit_pre->setText(expression);
 	}
+}
+
+static bool isOperator(QString c)
+{
+	return c == '+' || c == '-' || c == '*' || c == '/';
+}
+
+static bool isBracket(QChar c)
+{
+	return c == '(' || c == ')';
+}
+
+static bool isPriorityHigher(QChar c1, QChar c2)
+{
+	if (c1 == '*' || c1 == '/')
+		return true;
+	else if (c1 == '+' || c1 == '-')
+	{
+		if (c2 == '*' || c2 == '/')
+			return false;
+		else
+			return true;
+	}
+	else
+		return false;
 }
 
 void Calculator::buttonEqualClicked()
 {
 	effect->play();
-	if (preOperator != nullptr)
+	if(val!="0")
+		expression += val;
+	qDebug() << expression;
+
+	//转为后缀表达式
+	QStack<QString>stack2;
+	QStack<QChar>stack1;
+	QString tmp;
+	for (QString::const_iterator it = expression.begin(); it != expression.end(); it++)
 	{
-		const auto& preBtnName = preOperator->objectName();
-		const auto& num = ui.lineEdit->text().toDouble();
-		const double preVal_bef = preVal;
-		QChar op = '\0';
-		if (preBtnName == "pushButton_add")
+		if (*it == '-' && isOperator(*(it + 1)))//符号位
 		{
-			preVal += num;
-			op = '+';
+			tmp += *it;
 		}
-		else if (preBtnName == "pushButton_sub")
+		else if (it->isDigit() || *it == '.')//数字和小数点
 		{
-			preVal -= num;
-			op = '-';
+			tmp += *it;
 		}
-		else if (preBtnName == "pushButton_mul")
+		else if (isOperator(*it))
 		{
-			preVal *= num;
-			op = '*';
+			if (!tmp.isEmpty())
+			{
+				stack2.push(tmp);
+				tmp.clear();
+			}
+			while (true)
+			{
+				if (stack1.isEmpty() || stack1.top() == '(' || isPriorityHigher(*it, stack1.top()))
+				{
+					stack1.push(*it);
+					break;
+				}
+				else
+				{
+					stack2.push(stack1.pop());
+				}
+			}
 		}
-		else if (preBtnName == "pushButton_div")
+		else if (*it == '(')
 		{
-			preVal /= num;
-			op = '/';
+			if (!tmp.isEmpty())
+			{
+				stack2.push(tmp);
+				tmp.clear();
+			}
+			stack1.push(*it);
 		}
-		ui.lineEdit->setText(QString::number(preVal));
-		ui.lineEdit_pre->setText(QString::number(preVal_bef) + ' ' + op + ' ' + QString::number(num) + " =");
-		preOperator = nullptr;
+		else if (*it == ')')
+		{
+			if (!tmp.isEmpty())
+			{
+				stack2.push(tmp);
+				tmp.clear();
+			}
+			while (stack1.top() != '(')
+			{
+				stack2.push(stack1.pop());
+			}
+			stack1.pop();
+		}
+	}
+	if (!tmp.isEmpty())
+		stack2.push(tmp);
+	while (!stack1.isEmpty())
+	{
+		stack2.push(stack1.pop());
+	}
+
+	//Debug
+	for(const auto& s : stack2)
+	{
+		qDebug() << s;
+	}
+
+	//计算后缀表达式
+	QStack<QString> stack3;
+	for (const auto& s : stack2)
+	{
+		if (isOperator(s))
+		{
+			double num2 = stack3.pop().toDouble();
+			double num1 = stack3.pop().toDouble();
+			double result = 0;
+			if (s == "+")
+				result = num1 + num2;
+			else if (s == "-")
+				result = num1 - num2;
+			else if (s == "*")
+				result = num1 * num2;
+			else if (s == "/")
+				result = num1 / num2;
+			stack3.push(QString::number(result));
+		}
+		else
+		{
+			stack3.push(s);
+		}
+	}
+	val= stack3.pop();
+	ui.lineEdit->setText(val);
+	ui.lineEdit_pre->setText(expression + '=');
+	expression.clear();
+}
+
+void Calculator::buttonBracketClicked()
+{
+	static bool hasLeftBracket = false;
+	effect->play();
+	if (hasLeftBracket)
+	{
+		if(val!="0")
+			expression += val;
+		expression += ')';
+		val = '0';
+		ui.lineEdit->setText(val);
+		hasLeftBracket = false;
 	}
 	else
 	{
-		ui.lineEdit_pre->setText(ui.lineEdit->text() + '=');
+		expression += '(';
+		hasLeftBracket = true;
 	}
-	isRlt = true;
-}
-
-void Calculator::buttonCEClicked()
-{
-	effect->play();
-	ui.lineEdit->setText("0");
-	isRlt = false;
+	ui.lineEdit_pre->setText(expression);
 }
 
 void Calculator::buttonCClicked()
@@ -138,54 +223,46 @@ void Calculator::buttonCClicked()
 	effect->play();
 	ui.lineEdit->setText("0");
 	ui.lineEdit_pre->clear();
-	preVal = 0.0;
-	preOperator = nullptr;
-	isRlt = false;
+	expression.clear();
+	val = '0';
 }
 
 void Calculator::buttonDelClicked()
 {
 	effect->play();
-	auto text = ui.lineEdit->text();
-	if (text.isEmpty())
+	if(val.isEmpty())
 		return;
 	else
 	{
-		text.removeLast();
-		if (text.isEmpty())
-			text = "0";
-		ui.lineEdit->setText(text);
-		preVal = text.toDouble();
-		isRlt = false;
+		val.removeLast();
+		if (val.isEmpty())
+			ui.lineEdit->setText("0");
+		else
+			ui.lineEdit->setText(val);
 	}
 }
 
 void Calculator::buttonDotClicked()
 {
 	effect->play();
-	auto text = ui.lineEdit->text();
-	if (text.contains('.'))
-		return;
+	if(val.isEmpty())
+		val = "0.";
 	else
-	{
-		text += '.';
-		ui.lineEdit->setText(text);
-		isRlt = false;
-	}
+		val += ".";
+	ui.lineEdit->setText(val);
 }
 
 void Calculator::buttonSignClicked()
 {
 	effect->play();
-	auto text = ui.lineEdit->text();
-	if (text.isEmpty() || text == "0")
+	if(val.isEmpty())
 		return;
 	else
 	{
-		if (text.front() == '-')
-			text.removeFirst();
+		if (val.front() == '-')
+			val.removeFirst();
 		else
-			text.push_front('-');
-		ui.lineEdit->setText(text);
+			val.push_front('-');
+		ui.lineEdit->setText(val);
 	}
 }

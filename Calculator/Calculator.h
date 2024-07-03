@@ -19,7 +19,7 @@ private slots:
 
     void buttonEqualClicked();
 
-    void buttonCEClicked();
+    void buttonBracketClicked();
 
     void buttonCClicked();
 
@@ -32,8 +32,7 @@ private slots:
 private:
     Ui::CalculatorClass ui;
 
-    double preVal;
-    bool isRlt;
-    QAbstractButton* preOperator;
     QSoundEffect* effect;
+    QString expression;
+    QString val;
 };

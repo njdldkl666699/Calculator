@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>374</width>
-    <height>514</height>
+    <height>503</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -55,8 +55,11 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>20</pointsize>
+           <pointsize>26</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(205, 255, 248);</string>
          </property>
          <property name="text">
           <string>÷</string>
@@ -76,8 +79,11 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>20</pointsize>
+           <pointsize>26</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(205, 255, 248);</string>
          </property>
          <property name="text">
           <string>+</string>
@@ -99,6 +105,10 @@
           <font>
            <pointsize>20</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">color: rgb(255, 255, 255);
+background-color: rgb(207, 87, 247);</string>
          </property>
          <property name="text">
           <string>=</string>
@@ -181,6 +191,9 @@
            <pointsize>20</pointsize>
           </font>
          </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 226, 247);</string>
+         </property>
          <property name="text">
           <string>C</string>
          </property>
@@ -198,6 +211,9 @@
           <font>
            <pointsize>20</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 226, 247);</string>
          </property>
          <property name="text">
           <string>Del</string>
@@ -232,8 +248,11 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>20</pointsize>
+           <pointsize>26</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(205, 255, 248);</string>
          </property>
          <property name="text">
           <string>×</string>
@@ -307,7 +326,7 @@
         </widget>
        </item>
        <item row="1" column="0">
-        <widget class="QPushButton" name="pushButton_ce">
+        <widget class="QPushButton" name="pushButton_bracket">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
@@ -325,8 +344,11 @@
            <pointsize>20</pointsize>
           </font>
          </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(255, 226, 247);</string>
+         </property>
          <property name="text">
-          <string>CE</string>
+          <string>( )</string>
          </property>
         </widget>
        </item>
@@ -382,7 +404,7 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>20</pointsize>
+           <pointsize>24</pointsize>
           </font>
          </property>
          <property name="text">
@@ -442,8 +464,11 @@
          </property>
          <property name="font">
           <font>
-           <pointsize>20</pointsize>
+           <pointsize>36</pointsize>
           </font>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">background-color: rgb(205, 255, 248);</string>
          </property>
          <property name="text">
           <string>-</string>
@@ -519,6 +544,20 @@
     </item>
    </layout>
   </widget>
+  <action name="actionExpr">
+   <property name="icon">
+    <iconset resource="Calculator.qrc">
+     <normaloff>:/res/Icon.png</normaloff>:/res/Icon.png</iconset>
+   </property>
+   <property name="text">
+    <string>输入表达式</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>退出</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
@@ -536,7 +575,7 @@
   <tabstop>pushButton_sign</tabstop>
   <tabstop>lineEdit_pre</tabstop>
   <tabstop>lineEdit</tabstop>
-  <tabstop>pushButton_ce</tabstop>
+  <tabstop>pushButton_bracket</tabstop>
   <tabstop>pushButton_c</tabstop>
   <tabstop>pushButton_del</tabstop>
   <tabstop>pushButton_div</tabstop>
@@ -550,7 +589,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="buttonNumGroup"/>
   <buttongroup name="buttonOperatorGroup"/>
+  <buttongroup name="buttonNumGroup"/>
  </buttongroups>
 </ui>
