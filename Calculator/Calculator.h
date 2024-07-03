@@ -32,6 +32,8 @@ private:
     Ui::CalculatorClass ui;
 
     double preVal;
+
+    bool isRlt;
     
     QAbstractButton* preOperator;
 };

@@ -1,52 +1,57 @@
 #include "Calculator.h"
 
 Calculator::Calculator(QWidget* parent)
-    : QMainWindow(parent), preVal(0.0), preOperator(nullptr)
+	: QMainWindow(parent), preVal(0.0), preOperator(nullptr), isRlt(false)
 {
-    ui.setupUi(this);
-    connect(ui.buttonNumGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonNumClicked);
-    connect(ui.buttonOperatorGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonOperatorClicked);
-    connect(ui.pushButton_equal, &QPushButton::clicked, this, &Calculator::buttonEqualClicked);
-    connect(ui.pushButton_ce, &QPushButton::clicked, this, &Calculator::buttonCEClicked);
-    connect(ui.pushButton_c, &QPushButton::clicked, this, &Calculator::buttonCClicked);
-    connect(ui.pushButton_del, &QPushButton::clicked, this, &Calculator::buttonDelClicked);
-    connect(ui.pushButton_dot, &QPushButton::clicked, this, &Calculator::buttonDotClicked);
-    connect(ui.pushButton_sign, &QPushButton::clicked, this, &Calculator::buttonSignClicked);
+	ui.setupUi(this);
+	connect(ui.buttonNumGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonNumClicked);
+	connect(ui.buttonOperatorGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonOperatorClicked);
+	connect(ui.pushButton_equal, &QPushButton::clicked, this, &Calculator::buttonEqualClicked);
+	connect(ui.pushButton_ce, &QPushButton::clicked, this, &Calculator::buttonCEClicked);
+	connect(ui.pushButton_c, &QPushButton::clicked, this, &Calculator::buttonCClicked);
+	connect(ui.pushButton_del, &QPushButton::clicked, this, &Calculator::buttonDelClicked);
+	connect(ui.pushButton_dot, &QPushButton::clicked, this, &Calculator::buttonDotClicked);
+	connect(ui.pushButton_sign, &QPushButton::clicked, this, &Calculator::buttonSignClicked);
 }
 
 Calculator::~Calculator()
-{}
+{
+}
 
 void Calculator::buttonNumClicked(QAbstractButton* button)
 {
-    const auto& buttonName = button->objectName();
-    auto text = ui.lineEdit->text();
-    if (buttonName.isEmpty())
-        return;
-    else
-    {
-        const QChar num = buttonName.back();
-        if (text.isEmpty() || text == "0")
-            text = num;
-        else
-            text += num;
-        ui.lineEdit->setText(text);
-    }
+	if (isRlt)
+		ui.lineEdit->clear();
+
+	const auto& buttonName = button->objectName();
+	auto text = ui.lineEdit->text();
+	if (buttonName.isEmpty())
+		return;
+	else
+	{
+		const QChar num = buttonName.back();
+		if (text.isEmpty() || text == "0")
+			text = num;
+		else
+			text += num;
+		ui.lineEdit->setText(text);
+		isRlt = false;
+	}
 }
 
 void Calculator::buttonOperatorClicked(QAbstractButton* button)
 {
-    const auto& buttonName = button->objectName();
-    if (buttonName.isEmpty())
-        return;
-    else
-    {
-        if (preOperator != nullptr)
-        {
-            const auto& preBtnName = preOperator->objectName();
-            const auto& num = ui.lineEdit->text().toDouble();
-            if (preBtnName == "pushButton_add")
-                preVal += num;
+	const auto& buttonName = button->objectName();
+	if (buttonName.isEmpty())
+		return;
+	else
+	{
+		const auto& num = ui.lineEdit->text().toDouble();
+		if (preOperator != nullptr)
+		{
+			const auto& preBtnName = preOperator->objectName();
+			if (preBtnName == "pushButton_add")
+				preVal += num;
 			else if (preBtnName == "pushButton_sub")
 				preVal -= num;
 			else if (preBtnName == "pushButton_mul")
@@ -54,50 +59,85 @@ void Calculator::buttonOperatorClicked(QAbstractButton* button)
 			else if (preBtnName == "pushButton_div")
 				preVal /= num;
 			ui.lineEdit->setText(QString::number(preVal));
-        }
+		}
 		else
 		{
 			preVal = ui.lineEdit->text().toDouble();
 		}
-        preOperator = button;
-        ui.lineEdit->setText("0");
-    }
+
+		QChar op = '\0';
+		if (buttonName == "pushButton_add")
+			op = '+';
+		else if (buttonName == "pushButton_sub")
+			op = '-';
+		else if (buttonName == "pushButton_mul")
+			op = '*';
+		else if (buttonName == "pushButton_div")
+			op = '/';
+		ui.lineEdit_pre->setText(QString::number(preVal) + op);
+		preOperator = button;
+		//ui.lineEdit->setText("0");
+		isRlt = true;
+	}
 }
 
 void Calculator::buttonEqualClicked()
 {
-    if (preOperator != nullptr)
+	if (preOperator != nullptr)
 	{
 		const auto& preBtnName = preOperator->objectName();
 		const auto& num = ui.lineEdit->text().toDouble();
+		const double preVal_bef = preVal;
+		QChar op = '\0';
 		if (preBtnName == "pushButton_add")
+		{
 			preVal += num;
+			op = '+';
+		}
 		else if (preBtnName == "pushButton_sub")
+		{
 			preVal -= num;
+			op = '-';
+		}
 		else if (preBtnName == "pushButton_mul")
+		{
 			preVal *= num;
+			op = '*';
+		}
 		else if (preBtnName == "pushButton_div")
+		{
 			preVal /= num;
+			op = '/';
+		}
 		ui.lineEdit->setText(QString::number(preVal));
+		ui.lineEdit_pre->setText(QString::number(preVal_bef) + ' ' + op + ' ' + QString::number(num) + " =");
 		preOperator = nullptr;
 	}
+	else
+	{
+		ui.lineEdit_pre->setText(ui.lineEdit->text() + '=');
+	}
+	isRlt = true;
 }
 
 void Calculator::buttonCEClicked()
 {
-    ui.lineEdit->setText("0");
+	ui.lineEdit->setText("0");
+	isRlt = false;
 }
 
 void Calculator::buttonCClicked()
 {
-    ui.lineEdit->setText("0");
+	ui.lineEdit->setText("0");
+	ui.lineEdit_pre->clear();
 	preVal = 0.0;
 	preOperator = nullptr;
+	isRlt = false;
 }
 
 void Calculator::buttonDelClicked()
 {
-    auto text = ui.lineEdit->text();
+	auto text = ui.lineEdit->text();
 	if (text.isEmpty())
 		return;
 	else
@@ -107,6 +147,7 @@ void Calculator::buttonDelClicked()
 			text = "0";
 		ui.lineEdit->setText(text);
 		preVal = text.toDouble();
+		isRlt = false;
 	}
 }
 
@@ -119,15 +160,13 @@ void Calculator::buttonDotClicked()
 	{
 		text += '.';
 		ui.lineEdit->setText(text);
-        /*bool ok;
-		text.toDouble(&ok);
-        qDebug() << ok;*/
+		isRlt = false;
 	}
 }
 
 void Calculator::buttonSignClicked()
 {
-    auto text = ui.lineEdit->text();
+	auto text = ui.lineEdit->text();
 	if (text.isEmpty() || text == "0")
 		return;
 	else
