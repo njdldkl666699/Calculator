@@ -1,9 +1,12 @@
 #include "Calculator.h"
 
 Calculator::Calculator(QWidget* parent)
-	: QMainWindow(parent), preVal(0.0), preOperator(nullptr), isRlt(false)
+	: QMainWindow(parent), preVal(0.0), isRlt(false),
+	effect(new QSoundEffect(this)), preOperator(nullptr)
 {
 	ui.setupUi(this);
+	this->setWindowIcon(QIcon(":/res/Icon.png"));
+	effect->setSource(QUrl::fromLocalFile(":/res/sound.wav"));
 	connect(ui.buttonNumGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonNumClicked);
 	connect(ui.buttonOperatorGroup, &QButtonGroup::buttonClicked, this, &Calculator::buttonOperatorClicked);
 	connect(ui.pushButton_equal, &QPushButton::clicked, this, &Calculator::buttonEqualClicked);
@@ -20,6 +23,7 @@ Calculator::~Calculator()
 
 void Calculator::buttonNumClicked(QAbstractButton* button)
 {
+	effect->play();
 	if (isRlt)
 		ui.lineEdit->clear();
 
@@ -41,6 +45,7 @@ void Calculator::buttonNumClicked(QAbstractButton* button)
 
 void Calculator::buttonOperatorClicked(QAbstractButton* button)
 {
+	effect->play();
 	const auto& buttonName = button->objectName();
 	if (buttonName.isEmpty())
 		return;
@@ -83,6 +88,7 @@ void Calculator::buttonOperatorClicked(QAbstractButton* button)
 
 void Calculator::buttonEqualClicked()
 {
+	effect->play();
 	if (preOperator != nullptr)
 	{
 		const auto& preBtnName = preOperator->objectName();
@@ -122,12 +128,14 @@ void Calculator::buttonEqualClicked()
 
 void Calculator::buttonCEClicked()
 {
+	effect->play();
 	ui.lineEdit->setText("0");
 	isRlt = false;
 }
 
 void Calculator::buttonCClicked()
 {
+	effect->play();
 	ui.lineEdit->setText("0");
 	ui.lineEdit_pre->clear();
 	preVal = 0.0;
@@ -137,6 +145,7 @@ void Calculator::buttonCClicked()
 
 void Calculator::buttonDelClicked()
 {
+	effect->play();
 	auto text = ui.lineEdit->text();
 	if (text.isEmpty())
 		return;
@@ -153,6 +162,7 @@ void Calculator::buttonDelClicked()
 
 void Calculator::buttonDotClicked()
 {
+	effect->play();
 	auto text = ui.lineEdit->text();
 	if (text.contains('.'))
 		return;
@@ -166,6 +176,7 @@ void Calculator::buttonDotClicked()
 
 void Calculator::buttonSignClicked()
 {
+	effect->play();
 	auto text = ui.lineEdit->text();
 	if (text.isEmpty() || text == "0")
 		return;

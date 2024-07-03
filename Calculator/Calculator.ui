@@ -2,16 +2,22 @@
 <ui version="4.0">
  <class>CalculatorClass</class>
  <widget class="QMainWindow" name="CalculatorClass">
+  <property name="windowModality">
+   <enum>Qt::WindowModality::NonModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>374</width>
-    <height>508</height>
+    <height>514</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Calculator</string>
+  </property>
+  <property name="autoFillBackground">
+   <bool>false</bool>
   </property>
   <widget class="QWidget" name="centralWidget">
    <property name="sizePolicy">
@@ -308,6 +314,12 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="baseSize">
+          <size>
+           <width>0</width>
+           <height>0</height>
+          </size>
+         </property>
          <property name="font">
           <font>
            <pointsize>20</pointsize>
@@ -510,25 +522,27 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <tabstops>
+  <tabstop>pushButton_0</tabstop>
+  <tabstop>pushButton_1</tabstop>
+  <tabstop>pushButton_2</tabstop>
+  <tabstop>pushButton_3</tabstop>
+  <tabstop>pushButton_4</tabstop>
+  <tabstop>pushButton_5</tabstop>
+  <tabstop>pushButton_6</tabstop>
+  <tabstop>pushButton_7</tabstop>
+  <tabstop>pushButton_8</tabstop>
+  <tabstop>pushButton_9</tabstop>
+  <tabstop>pushButton_dot</tabstop>
+  <tabstop>pushButton_sign</tabstop>
+  <tabstop>lineEdit_pre</tabstop>
+  <tabstop>lineEdit</tabstop>
   <tabstop>pushButton_ce</tabstop>
   <tabstop>pushButton_c</tabstop>
   <tabstop>pushButton_del</tabstop>
   <tabstop>pushButton_div</tabstop>
-  <tabstop>pushButton_7</tabstop>
-  <tabstop>pushButton_8</tabstop>
-  <tabstop>pushButton_9</tabstop>
   <tabstop>pushButton_mul</tabstop>
-  <tabstop>pushButton_4</tabstop>
-  <tabstop>pushButton_5</tabstop>
-  <tabstop>pushButton_6</tabstop>
   <tabstop>pushButton_sub</tabstop>
-  <tabstop>pushButton_1</tabstop>
-  <tabstop>pushButton_2</tabstop>
-  <tabstop>pushButton_3</tabstop>
   <tabstop>pushButton_add</tabstop>
-  <tabstop>pushButton_sign</tabstop>
-  <tabstop>pushButton_0</tabstop>
-  <tabstop>pushButton_dot</tabstop>
   <tabstop>pushButton_equal</tabstop>
  </tabstops>
  <resources>

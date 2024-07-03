@@ -1,4 +1,6 @@
 <RCC>
-    <qresource prefix="Calculator">
+    <qresource prefix="/res">
+        <file>Icon.png</file>
+        <file>sound.wav</file>
     </qresource>
 </RCC>

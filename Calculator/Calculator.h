@@ -2,6 +2,7 @@
 
 #include <QtWidgets/QMainWindow>
 #include "ui_Calculator.h"
+#include <QSoundEffect>
 
 class Calculator : public QMainWindow
 {
@@ -32,8 +33,7 @@ private:
     Ui::CalculatorClass ui;
 
     double preVal;
-
     bool isRlt;
-    
     QAbstractButton* preOperator;
+    QSoundEffect* effect;
 };
